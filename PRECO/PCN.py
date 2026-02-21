@@ -61,21 +61,23 @@ class PCnet(PCmodel):
 
 
     def _reset_params(self):
-        self.w, self.b = [], []
+        self.w = [torch.empty(0, 0, device=DEVICE) for _ in range(self.L + 1)]
+        self.b = [torch.empty(0, device=DEVICE) for _ in range(self.L + 1)]
+
         for l in self.weight_layers:
-            in_size = self.structure.layers[l] if self.structure.upward else self.structure.layers[l+1]
-            out_size = self.structure.layers[l+1] if self.structure.upward else self.structure.layers[l]
-            
-            self.w.append(torch.empty( in_size, out_size, device=DEVICE))  
+            if self.structure.upward:
+                in_size = self.structure.layers[l]
+                out_size = self.structure.layers[l + 1]
+            else:
+                in_size = self.structure.layers[l]
+                out_size = self.structure.layers[l - 1]
+
+            self.w[l] = torch.empty(in_size, out_size, device=DEVICE)
             self.weight_init(self.w[l])
 
             if self.structure.use_bias:
-                self.b.append(torch.empty( out_size, device=DEVICE))
+                self.b[l] = torch.empty(out_size, device=DEVICE)
                 self.bias_init(self.b[l])
-       
-        k = self.L if self.structure.upward else 0  # up convention: w0, w1, w2; down convention: w1, w2, w3
-        self.w.insert(k, torch.empty(0,0, device=DEVICE)) 
-        self.b.insert(k, torch.empty(0, device=DEVICE))
                 
         self.no_weigths = sum([wl.shape[0]*wl.shape[1] for wl in self.w])
         if self.structure.use_bias:

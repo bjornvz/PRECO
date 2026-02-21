@@ -159,7 +159,7 @@ class PCgraph(PCmodel):
 
         return self.x[:,-self.structure.shape[2]:] 
 
-    def test_iterative(self, X_batch, diagnostics=None, early_stop=False):
+    def test_iterative(self, X_batch):
         X_batch = to_vector(X_batch)     # makes e.g. 28*28 -> 784
 
         self.reset_nodes(batch_size=X_batch.shape[0])
@@ -167,7 +167,7 @@ class PCgraph(PCmodel):
         self.init_hidden()
         self.init_output()
 
-        self.update_xs(train=False, diagnostics=diagnostics, early_stop=early_stop)
+        self.update_xs(train=False)
         return self.x[:,-self.structure.shape[2]:] 
 
     def get_weights(self):
