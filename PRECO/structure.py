@@ -240,7 +240,7 @@ class PCN_MBA(PCNStructure):
         return self.fl(out + bias, l)
 
     def grad_x(self, l, x, e, w, b, train):
-        k = l + 1 if self.upward else l + 1
+        k = l + 1 if self.upward else l - 1
         bias = b[l] if self.use_bias else 0
 
         if l != self.L:
